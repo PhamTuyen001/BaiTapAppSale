@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:dio/dio.dart';
 import '../../../common/constants/api_constant.dart';
 import 'dio_client.dart';
@@ -31,5 +33,18 @@ class ApiRequest {
       "password": password
     });
   }
+
+
+  Future getProducts() async {
+    ReceivePort receivePort = ReceivePort();
+    Isolate.spawn((SendPort sendPort) {
+      _dio.get(ApiConstant.PRODUCTS)
+          .then((value) => sendPort.send(value))
+          .catchError((error) => sendPort.send(error));
+    }, receivePort.sendPort);
+
+    return receivePort.first;
+  }
+
 
 }

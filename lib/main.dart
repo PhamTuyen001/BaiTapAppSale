@@ -4,9 +4,13 @@ import 'package:baitap_appsale/presentation/features/sign_up/sign_up_page.dart';
 import 'package:baitap_appsale/presentation/features/splash/splash_page.dart';
 import 'package:flutter/material.dart';
 
+import 'data/datasources/local/cache/app_cache.dart';
+
 void main() {
   runApp(const MyApp());
+  AppCache.init();
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

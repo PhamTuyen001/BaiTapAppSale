@@ -14,6 +14,7 @@ class ProductRepository {
     Completer<AppResource<List<ProductDTO>>> completer = Completer();
     try {
       Response<dynamic> response =  await _apiRequest.getProducts();
+      print(response);
       // TODO: Improve use Isolate
       AppResource<List<ProductDTO>> resourceProductDTO = AppResource.fromJson(response.data, (listData){
         return (listData as List).map((e) => ProductDTO.fromJson(e)).toList();

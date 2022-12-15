@@ -1,4 +1,18 @@
+import 'package:baitap_appsale/data/datasources/local/cache/app_cache.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../common/bases/base_widget.dart';
+import '../../../common/constants/api_constant.dart';
+import '../../../common/constants/variable_constant.dart';
+import '../../../common/utils/extension.dart';
+import '../../../common/widgets /loading_widget.dart';
+import '../../../data/datasources/remote/api_request.dart';
+import '../../../data/model/product.dart';
+import '../../../data/repositories/product_repository.dart';
+import 'home_bloc.dart';
+import 'home_event.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -9,6 +23,132 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return PageContainer(
+      providers: [
+        Provider(create: (context) => ApiRequest()),
+        ProxyProvider<ApiRequest, ProductRepository>(
+          create: (context) => ProductRepository(),
+          update: (context, request, repository) {
+            repository?.updateApiRequest(request);
+            return repository!;
+          },
+        ),
+        ProxyProvider<ProductRepository, HomeBloc>(
+          create: (context) => HomeBloc(),
+          update: (context, repository, bloc) {
+            bloc?.updateProductRepo(repository);
+            return bloc!;
+          },
+        ),
+      ],
+      child: HomeContainer(),
+    );
   }
+}
+
+class HomeContainer extends StatefulWidget {
+  @override
+  State<HomeContainer> createState() => _HomeContainerState();
+}
+
+class _HomeContainerState extends State<HomeContainer> {
+  late HomeBloc bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    bloc = context.read();
+    bloc.eventSink.add(FetchProductEvent());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Product'),
+          actions: [],
+        ),
+        body: Stack(children: [
+          StreamBuilder<List<Product>>(
+              initialData: [],
+              stream: bloc.products,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text("Data is error");
+                } else if (snapshot.hasData) {
+                  return ListView.builder(
+                      itemCount: snapshot.data?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        return _buildItemFood(snapshot.data?[index]);
+                      });
+                } else {
+                  return Container();
+                }
+              }),
+          LoadingWidget(child: Container(), bloc: bloc),
+        ])
+    );
+  }
+  Widget _buildItemFood(Product? product) {
+    if (product == null) return Container();
+    return Container(
+      height: 135,
+      child: Card(
+        elevation: 5,
+        shadowColor: Colors.blueGrey,
+        child: Container(
+          padding: EdgeInsets.only(top: 5, bottom: 5),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(5),
+                child: Image.network(ApiConstant.BASE_URL + product.img,
+                    width: 150, height: 120, fit: BoxFit.fill),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: Text(product.name.toString(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 16)),
+                      ),
+                      Text("Giá : ${formatPrice(product.price)} đ",
+                          style: TextStyle(fontSize: 12)),
+                      ElevatedButton(
+                        onPressed: () {
+                        },
+                        style: ButtonStyle(
+                            backgroundColor:
+                            MaterialStateProperty.resolveWith((states) {
+                              if (states.contains(MaterialState.pressed)) {
+                                return Color.fromARGB(200, 240, 102, 61);
+                              } else {
+                                return Color.fromARGB(230, 240, 102, 61);
+                              }
+                            }),
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(10))))),
+                        child:
+                        Text("Add To Cart", style: TextStyle(fontSize: 14)),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 }

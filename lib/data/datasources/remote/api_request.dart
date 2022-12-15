@@ -24,4 +24,12 @@ class ApiRequest {
       "password": password
     });
   }
+
+  Future signInRequest(String email, String password) {
+    return _dio.post(ApiConstant.SIGN_IN, data: {
+      "email": email,
+      "password": password
+    });
+  }
+
 }

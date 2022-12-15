@@ -29,4 +29,19 @@ class AuthenticationRepository {
   }
 
 
+  Future<AppResource<UserDTO>> signIn(String email, String password) async{
+    Completer<AppResource<UserDTO>> completer = Completer();
+    try {
+      Response<dynamic> response =  await _apiRequest.signInRequest(email, password);
+      // TODO: Improve use Isolate
+      AppResource<UserDTO> resourceUserDTO = AppResource.fromJson(response.data, UserDTO.fromJson);
+      completer.complete(resourceUserDTO);
+    } on DioError catch (dioError) {
+      completer.completeError(dioError.response?.data["message"]);
+    } catch(e) {
+      completer.completeError(e.toString());
+    }
+    return completer.future;
+  }
+
 }

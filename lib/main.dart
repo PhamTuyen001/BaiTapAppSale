@@ -1,4 +1,5 @@
 import 'package:baitap_appsale/presentation/features/home/home_page.dart';
+import 'package:baitap_appsale/presentation/features/order/order_page.dart';
 import 'package:baitap_appsale/presentation/features/sign_in/sign_in_page.dart';
 import 'package:baitap_appsale/presentation/features/sign_up/sign_up_page.dart';
 import 'package:baitap_appsale/presentation/features/splash/splash_page.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         "sign-up": (context) => SignUpPage(),
         "splash": (context) => SplashPage(),
         "home": (context) => HomePage(),
+        "order": (context) => OrderPage(),
       },
         initialRoute: "splash",
     );

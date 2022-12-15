@@ -2,7 +2,6 @@ import 'package:baitap_appsale/presentation/features/sign_in/sign_in_bloc.dart';
 import 'package:baitap_appsale/presentation/features/sign_in/sign_in_event.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:provider/single_child_widget.dart';
 
 import '../../../common/bases/base_widget.dart';
 import '../../../common/utils/extension.dart';

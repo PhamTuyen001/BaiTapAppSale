@@ -1,18 +1,20 @@
-import 'package:baitap_appsale/data/datasources/local/cache/app_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../common/bases/base_widget.dart';
 import '../../../common/constants/api_constant.dart';
-import '../../../common/constants/variable_constant.dart';
 import '../../../common/utils/extension.dart';
 import '../../../common/widgets /loading_widget.dart';
 import '../../../data/datasources/remote/api_request.dart';
+import '../../../data/model/cart.dart';
 import '../../../data/model/product.dart';
+import '../../../data/repositories/cart_repository.dart';
 import '../../../data/repositories/product_repository.dart';
+import '../cart/cart_bloc.dart';
+import '../cart/cart_event.dart';
 import 'home_bloc.dart';
 import 'home_event.dart';
-
+import 'package:badges/badges.dart';
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -40,6 +42,20 @@ class _HomePageState extends State<HomePage> {
             return bloc!;
           },
         ),
+        ProxyProvider<ApiRequest, CartRespository>(
+          create: (context) => CartRespository(),
+          update: (context, request, repository) {
+            repository?.updateApiRequest(request);
+            return repository!;
+          },
+        ),
+        ProxyProvider<CartRespository, CartBloc>(
+          create: (context) => CartBloc(),
+          update: (context, repository, bloc) {
+            bloc?.updateRepository(repository);
+            return bloc!;
+          },
+        )
       ],
       child: HomeContainer(),
     );
@@ -53,12 +69,15 @@ class HomeContainer extends StatefulWidget {
 
 class _HomeContainerState extends State<HomeContainer> {
   late HomeBloc bloc;
+  late CartBloc cartBloc;
 
   @override
   void initState() {
     super.initState();
     bloc = context.read();
+    cartBloc =context.read();
     bloc.eventSink.add(FetchProductEvent());
+    cartBloc.eventSink.add(FetchCartEvent());
   }
 
   @override
@@ -66,7 +85,48 @@ class _HomeContainerState extends State<HomeContainer> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Product'),
-          actions: [],
+          actions: [
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.list_alt_sharp),
+                  onPressed: (){
+                    Navigator.pushNamed(context,'order');
+                  },
+                ),
+                Consumer<CartBloc>(
+                    builder: (context, bloc, child){
+                      return StreamBuilder<Cart>(
+                          initialData: null,
+                          stream: bloc.streamController.stream,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError || snapshot.data == null || snapshot.data?.products.isEmpty == true) {
+                              return IconButton(
+                                  icon: Icon(Icons.shopping_cart),
+                                  onPressed: () {Navigator.pushNamed(context, "cart");}
+                              );
+                            }
+                            int count = snapshot.data?.products.length ?? 0;
+
+                            return Container(
+                              margin: EdgeInsets.only(right: 10, top: 5),
+                              child: Badge(
+                                  padding: EdgeInsets.all(10),
+                                  badgeContent: Text(count.toString(),
+                                      style: TextStyle(fontSize: 15, color: Colors.white)),
+                                  child: IconButton(
+                                      icon: Icon(Icons.shopping_cart),
+                                      onPressed: () {
+                                        Navigator.pushNamed(context, "cart" );
+                                      })),
+                            );
+                          });
+                    }
+                )
+              ],
+            )
+
+          ],
         ),
         body: Stack(children: [
           StreamBuilder<List<Product>>(

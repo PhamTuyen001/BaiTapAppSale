@@ -183,6 +183,7 @@ class _HomeContainerState extends State<HomeContainer> {
                           style: TextStyle(fontSize: 12)),
                       ElevatedButton(
                         onPressed: () {
+                          cartBloc.eventSink.add(AddCartEvent(product.id));
                         },
                         style: ButtonStyle(
                             backgroundColor:

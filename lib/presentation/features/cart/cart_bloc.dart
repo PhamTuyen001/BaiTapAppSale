@@ -30,6 +30,9 @@ class CartBloc extends BaseBloc{
       case FetchCartEvent:
         handleFetchCartEvent();
         break;
+      case AddCartEvent:
+        handleAddCartEvent (event as AddCartEvent);
+        break;
     }
   }
   @override
@@ -61,5 +64,17 @@ class CartBloc extends BaseBloc{
     loadingSink.add(false);
   }
 
+
+  void handleAddCartEvent(AddCartEvent event) async{
+    loadingSink.add(true);
+    try{
+      AppResource<CartDTO> appResourceDTO = await _cartRespository.addToCart(event.idProduct);
+      if (appResourceDTO.data == null) return;
+      handleFetchCartEvent();
+    }catch (e){
+      print(e.toString());
+    }
+    loadingSink.add(false);
+  }
 
 }

@@ -9,4 +9,6 @@ class AppResponse<T> {
     data = parseModel(json['data']);
   }
 
+
+
 }

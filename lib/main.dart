@@ -1,3 +1,5 @@
+import 'package:baitap_appsale/presentation/features/home/home_page.dart';
+import 'package:baitap_appsale/presentation/features/sign_up/sign_up_page.dart';
 import 'package:baitap_appsale/presentation/features/splash/splash_page.dart';
 import 'package:flutter/material.dart';
 
@@ -16,9 +18,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(),
       debugShowCheckedModeBanner: false,
       routes: {
+        "sign-up": (context) => SignUpPage(),
         "splash": (context) => SplashPage(),
+        "home": (context) => HomePage(),
       },
-        initialRoute: "splash",
+        initialRoute: "sign-up",
     );
   }
 }

@@ -62,4 +62,15 @@ class ApiRequest {
     );
   }
 
+  Future updateCart(String id_product,String id_cart,int qty){
+    return _dio.post(ApiConstant.UPDATE_CART,
+        data:{"id_product":id_product,"id_cart":id_cart,"quantity":qty},
+        options: Options(
+            headers: {
+              "authorization":"Bearer ${AppCache.getString(VariableConstant.TOKEN)}"
+            }
+        )
+    );
+  }
+
 }

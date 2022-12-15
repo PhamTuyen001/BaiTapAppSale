@@ -6,9 +6,20 @@ class FetchCartEvent extends BaseEvent{
   List<Object?> get props => [];
 }
 
+
+
 class AddCartEvent extends BaseEvent{
   String idProduct;
   AddCartEvent(this.idProduct);
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
+class ChangeQtyCartItemEvent extends BaseEvent{
+  String idProduct;
+  String idCart;
+  int quantity;
+  ChangeQtyCartItemEvent(this.idProduct, this.idCart , this.quantity);
   @override
   // TODO: implement props
   List<Object?> get props => [];

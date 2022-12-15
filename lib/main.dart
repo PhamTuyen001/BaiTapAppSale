@@ -1,3 +1,4 @@
+import 'package:baitap_appsale/presentation/features/cart/cart_page.dart';
 import 'package:baitap_appsale/presentation/features/home/home_page.dart';
 import 'package:baitap_appsale/presentation/features/order/order_page.dart';
 import 'package:baitap_appsale/presentation/features/sign_in/sign_in_page.dart';
@@ -20,14 +21,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'AppSale',
       theme: ThemeData(),
       debugShowCheckedModeBanner: false,
       routes: {
         "sign-in": (context) => SignInPage(),
         "sign-up": (context) => SignUpPage(),
-        "splash": (context) => SplashPage(),
-        "home": (context) => HomePage(),
+        "splash": (context) => const SplashPage(),
+        "home": (context) => const HomePage(),
+        "cart":(context) => CartPage(),
         "order": (context) => OrderPage(),
       },
         initialRoute: "splash",

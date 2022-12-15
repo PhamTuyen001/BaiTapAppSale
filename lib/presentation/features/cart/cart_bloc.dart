@@ -33,6 +33,9 @@ class CartBloc extends BaseBloc{
       case AddCartEvent:
         handleAddCartEvent (event as AddCartEvent);
         break;
+      case ChangeQtyCartItemEvent:
+        _ChangeQtyCartItemEvent(event as ChangeQtyCartItemEvent);
+        break;
     }
   }
   @override
@@ -72,6 +75,33 @@ class CartBloc extends BaseBloc{
       if (appResourceDTO.data == null) return;
       handleFetchCartEvent();
     }catch (e){
+      print(e.toString());
+    }
+    loadingSink.add(false);
+  }
+
+  int getQtyProductCart(String idProduct){
+    int quantity = 0;
+    if(_cartModel == null) {
+      return 0;
+    }
+    for(int i = 0; i<_cartModel!.products.length;i++){
+      if(_cartModel!.products[i].id == idProduct){
+        quantity = _cartModel!.products[i].quantity;
+      }
+    }
+    return quantity;
+  }
+
+  void _ChangeQtyCartItemEvent(ChangeQtyCartItemEvent event) async{
+    loadingSink.add(true);
+    try{
+      int qty = getQtyProductCart(event.idProduct) + event.quantity;
+
+      AppResource<CartDTO> resourceDTO = await _cartRespository.updateCart(event.idProduct,event.idCart,qty>0?qty:1);
+      if (resourceDTO.data == null) return;
+      handleFetchCartEvent();
+    }catch(e){
       print(e.toString());
     }
     loadingSink.add(false);

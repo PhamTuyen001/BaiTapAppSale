@@ -36,6 +36,9 @@ class CartBloc extends BaseBloc{
       case ChangeQtyCartItemEvent:
         _ChangeQtyCartItemEvent(event as ChangeQtyCartItemEvent);
         break;
+      case ConfirmCartEvent:
+        handleConfirmCartEvent(event as ConfirmCartEvent);
+        break;
     }
   }
   @override
@@ -103,6 +106,19 @@ class CartBloc extends BaseBloc{
       handleFetchCartEvent();
     }catch(e){
       print(e.toString());
+    }
+    loadingSink.add(false);
+  }
+
+  void handleConfirmCartEvent(ConfirmCartEvent event) async{
+    loadingSink.add(true);
+    try{
+      String resource = await _cartRespository.confirmCart();
+      progressSink.add(ConfirmCartSuccessEvent(resource));
+      _cartModel!.clear();
+      _streamController.add(_cartModel!);
+    }catch(e){
+      progressSink.add(ConfirmCartFailedEvent(message: e.toString()));
     }
     loadingSink.add(false);
   }

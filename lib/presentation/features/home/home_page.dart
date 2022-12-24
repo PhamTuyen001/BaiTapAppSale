@@ -88,12 +88,7 @@ class _HomeContainerState extends State<HomeContainer> {
           actions: [
             Row(
               children: [
-                IconButton(
-                  icon: Icon(Icons.list_alt_sharp),
-                  onPressed: (){
-                    Navigator.pushNamed(context,'order');
-                  },
-                ),
+
                 Consumer<CartBloc>(
                     builder: (context, bloc, child){
                       return StreamBuilder<Cart>(

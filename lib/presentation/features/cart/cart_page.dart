@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import '../../../common/widgets /progress_listener_widget.dart';
 import '../../../common/bases/base_widget.dart';
 import '../../../common/constants/api_constant.dart';
 import '../../../common/utils/extension.dart';
 import '../../../data/datasources/remote/api_request.dart';
+import '../../../common/widgets /loading_widget.dart';
 import '../../../data/model/cart.dart';
 import '../../../data/model/product.dart';
 import '../../../data/repositories/cart_repository.dart';
@@ -61,52 +62,72 @@ class _CartContainerState extends State<CartContainer> {
       appBar: AppBar(
         title: Text('Cart Page'),
       ),
-      body: Container(
-        child: StreamBuilder<Cart>(
-            initialData: null,
-            stream: bloc.streamController.stream,
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Text("Data is error");
-              } else if (snapshot.hasData) {
-                List ProductCart = snapshot.data?.products ?? [];
-                String idCart = snapshot.data?.id ?? '';
-                return Column(
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                          itemCount: ProductCart.length ?? 0,
-                          itemBuilder: (lstContext, index) =>
-                              _buildItem(ProductCart[index], idCart, context)),
-                    ),
-                    Container(
-                        margin: EdgeInsets.symmetric(vertical: 10),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: Colors.teal,
-                            borderRadius: BorderRadius.all(Radius.circular(5))),
-                        child: Text(
-                            "Tổng tiền : ${formatPrice(snapshot.data?.price ?? 0)} đ",
-                            style: TextStyle(fontSize: 25, color: Colors.white))),
-                    Container(
-                        margin: EdgeInsets.only(bottom: 10),
-                        padding: EdgeInsets.all(10),
-                        child: ElevatedButton(
-                          onPressed: () {
+      body: Stack(
+        children: [
+          Container(
+            child: StreamBuilder<Cart>(
+                initialData: null,
+                stream: bloc.streamController.stream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text("Data is error");
+                  } else if (snapshot.hasData) {
+                    List ProductCart = snapshot.data?.products ?? [];
+                    String idCart = snapshot.data?.id ?? '';
+                    return Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                              itemCount: ProductCart.length ?? 0,
+                              itemBuilder: (lstContext, index) =>
+                                  _buildItem(ProductCart[index], idCart, context)),
+                        ),
+                        Container(
+                            margin: EdgeInsets.symmetric(vertical: 10),
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                color: Colors.teal,
+                                borderRadius: BorderRadius.all(Radius.circular(5))),
+                            child: Text(
+                                "Tổng tiền : ${formatPrice(snapshot.data?.price ?? 0)} đ",
+                                style: TextStyle(fontSize: 25, color: Colors.white))),
+                        Container(
+                            margin: EdgeInsets.only(bottom: 10),
+                            padding: EdgeInsets.all(10),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                bloc.eventSink.add(ConfirmCartEvent());
+                              },
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                  MaterialStateProperty.all(Colors.deepOrange)),
+                              child: Text("Confirm",
+                                  style: TextStyle(color: Colors.white, fontSize: 25)),
+                            )),
+                        ProgressListenerWidget<CartBloc>(
+                          child: Container(),
+                          callback: (event) {
+                            switch (event.runtimeType) {
+                              case ConfirmCartSuccessEvent:
+                                showSnackBar(context, "Khởi tạo đơn hàng thành công");
+                                Navigator.pushReplacementNamed(context, "order");
+                                break;
+                              case ConfirmCartFailedEvent:
+                                showSnackBar(context, (event as ConfirmCartFailedEvent).message);
+                                break;
+                            }
                           },
-                          style: ButtonStyle(
-                              backgroundColor:
-                              MaterialStateProperty.all(Colors.deepOrange)),
-                          child: Text("Confirm",
-                              style: TextStyle(color: Colors.white, fontSize: 25)),
-                        ))
-                  ],
-                );
-              } else {
-                return Container();
-              }
-            }
-        ),
+                        )
+                      ],
+                    );
+                  } else {
+                    return Container();
+                  }
+                }
+            ),
+          ),
+          LoadingWidget(child: Container(), bloc: bloc),
+        ],
       ),
     );
   }

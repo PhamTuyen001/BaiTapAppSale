@@ -40,6 +40,16 @@ class ApiRequest {
   Future getProducts() {
     return _dio.get(ApiConstant.PRODUCTS);
   }
+  Future orderHistory() {
+    return _dio.get(ApiConstant.GET_ORDER,
+        options: Options(
+            headers: {
+              "authorization":"Bearer ${AppCache.getString(VariableConstant.TOKEN)}"
+            }
+        )
+    );
+  }
+
 
   Future getCart() {
     return _dio.get(ApiConstant.CART,
@@ -69,6 +79,18 @@ class ApiRequest {
             headers: {
               "authorization":"Bearer ${AppCache.getString(VariableConstant.TOKEN)}"
             }
+        )
+    );
+  }
+
+  Future confirmCart() {
+    return _dio.post(ApiConstant.CONFIRM_CART,
+        data: {
+          "id_cart": AppCache.getString(VariableConstant.CART_ID),
+          "status" : false
+        },
+        options: Options(
+            headers: {"authorization":"Bearer ${AppCache.getString(VariableConstant.TOKEN)}"}
         )
     );
   }

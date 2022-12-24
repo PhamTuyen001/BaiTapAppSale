@@ -27,4 +27,10 @@ class Cart {
   String toString() {
     return 'Cart{id: $id, date_created: $dateCreated ,products: $products, id_user: $idUser, price: $price }';
   }
+
+  void clear(){
+    this.products.clear();
+    this.price = 0;
+    this.dateCreated = "";
+  }
 }
